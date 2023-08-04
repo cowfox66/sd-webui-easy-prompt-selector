@@ -1,235 +1,85 @@
 # Easy Prompt Selector
 
-[使い方(暫定)](https://blue-pen5805.fanbox.cc/posts/5306601)
+基于[原插件](https://github.com/blue-pen5805/sdweb-easy-prompt-selector):
 
-## English Readme
+- 修改了相关**按钮**为**中英文**
+- 优化了代码
+  - 支持**标签文件**基于**子文件夹**进行分类和管理
+  - 强化了**标签随机选择**功能,使其更加智能
+- 增加了**中文**提示词**标签库** (来源于[路过银河](https://zhuanlan.zhihu.com/p/637757484)大大制作的词包!!)
 
-This extension, designed to simplify the process of inputting prompts, is currently available exclusively in Japanese. An English version may be considered for future development.
+## 基本使用
 
-I created this tool due to frequent errors and forgetfulness in word usage, and to manage Dynamic Prompts which I found to be overly complex.
+- 在默认状态下,**默认标签文件夹**(`./tags/`)为**空**,插件将自动拷贝**示例标签文件夹**(`./tags_examples/`)中的**所有**示例标签进行使用!
+  - 注意!! 拷贝会包括`🔞十八禁`标签~~~
+  - 推荐: 根据需要,将需要的标签文件**拷贝**到**默认标签文件夹**中,以规避使用**整个示例标签文件夹**.
+- **标签文件的文件名**即为显示在WebUI上下拉列表中的**选项名** - 你可以参考**示例标签文件夹**中的文件名,利用`_`来进行分类和排序.
+  - 注意!! 标签文件的文件名确保**全局唯一**!! 否则相同文件名会产生覆盖.
+  - 标签文件可以通过**子文件夹**方便分类管理.
+    - 注意!! 子文件夹的文件夹名不会出现在**选项名**中.
+- 标签文件的定义格式为`yaml`格式. 其中,
+  - 每个标签项中,`:`**前面**的是显示在WebUI上的**选项名**, **后面**的是插入到**提示词输入框**中的**提示词**.
+  - 注意!!在**每一个层级**中, **选项名**不能重复!! 例如, 下面的写法是错误的.
+  - 如果**提示词**有**数字, 或其他特殊符号(例如: `{}, <>` 等)**, 需要用**引号**(`""`)进行包裹
+- 选择标签分为 **2** 个级别:
+  - 标签类别 - 鼠标**左键**点击后添加一个**标签随机选择标记**, 在生成图片时根据规则随机替换为一个**该类别中**的一个标签.
+  - 标签 - 鼠标**左键**点击添加, **右键**点击去除.
 
-It's important to mention that the testing of this extension has been limited to local Windows environments. As such, its performance on platforms like colab remains uncertain.
-
-Feedback is highly appreciated from anyone who has successfully operated it. However, be aware that troubleshooting may not be possible if it doesn't function as intended.
-
-### Features
-
-Please watch the video below for a quick overview (mp4 file download required due to GitHub limitations).
-
-[![How to Use](media/02-01.png)](media/%E7%B0%A1%E5%8D%98%E3%81%AA%E4%BD%BF%E3%81%84%E6%96%B9.mp4)
-
-Due to recording limitations, the drop-down menu does not appear in the video.
-
-- Type in any words you like by pressing the button.
-- Use categories for random input, like a wildcard.
-- Customize the tool to suit your needs.
-
-### Installation
-
-1. Navigate to the "Extensions" tab.
-2. Open the "Install from URL" section.
-3. Enter `https://github.com/blue-pen5805/sdweb-easy-prompt-selector` in the "URL of the extension repository" field.
-4. Click "Install" and wait a moment.
-5. Go to the "Installed" tab and click "Apply and restart the UI".
-
-After loading, you should see this:
-
-![🔯Select Tag](media/01-01.jpeg)
-
-Click "🔯Select Tag" under the style, and the screen will look like this:
-
-![Screenshot of easy prompt selector](media/01-02.jpeg)
-
-### Usage
-
-Clicking a button automatically adds the corresponding string to the prompt input field. It's quite straightforward, isn't it?
-
-As a bonus feature, if you press the orange button, one of the options in the category will be randomly selected at the time of generation.
-
-[![Random Generation](media/02-02.png)](media/%E3%83%A9%E3%83%B3%E3%83%80%E3%83%A0%E7%94%9F%E6%88%90.mp4)
-
-(Viewing this video requires downloading the mp4 file due to GitHub limitations)
-
-### Customization
-
-Add a *.yml file to `stable-diffusion-webui\extensions\sdweb-easy-prompt-selector\tags`, and you can add, change, and delete freely.
-
-In general, it should be self-explanatory if you inspect the default file!
-
-This file is in yaml format, which can be written in various ways.
-
-For now, let's focus on the following methods:
-
-#### For users who just want the buttons to appear
-
-List your options starting with a "-".
-
-Example: tags/test.yml
-
-```yml
-- standing
-- sitting
-- squatting
-```
-![just buttons](media/01-03.jpeg)
-
-#### For users who want to customize the button labels
-
-List your options in the "display name: input string" format.
-
-Example: tags/test.yml
-
-```yml
-Stand: standing
-Sit: sitting
-Squat: squatting
+```yaml
+# tags/建筑.yml
+建筑:
+  房子: house
+  # 注意!! `选项名`不能重复!
+  房子: home
 ```
 
-![with name customized bottuns](media/01-04.jpeg)
+> 注意!! 由于插件会对`@, $`进行语义转换处理, 因此, 在使用本插件的时候, 尽量避免在提示词中使用`@, $`.
 
-#### For users who want to categorize
+## 高阶使用 - 标签随机选择标记
 
-Add "category name:", and precede the next line with one or more spaces (two is recommended).
+最新版的插件支持通过`@, $`的语义解析, 定义一个**标签随机选择标记**, 可以实现:
 
-Example: tags/test.yml
+- 通过定义,可以在**一定的范围内**随机选择**一定数量**的标签
+- 上述选择过程可以**嵌套**
+  - 注意: 考虑到性能, **嵌套**最大可以到 `10` 层
+- 格式: `@{num|min-max}$${tag_path}@`
+  - `{num|min-max}$$` - 标明**随机选择**的个数, 可选
+    - 没有的话,默认**随机选择 1 个**
+    - `num` 和 `min-max` 只需要使用一个; 使用 `min-max` 时, `min`为最小值(可以为`0`),`max`为最大值
+  - `tag_path` 标明目标标签的**获取路径**, 从`最初的标签文件名`开始
+    - 多级路径以 `:` 进行分隔
 
-```yml
-Posture:
-  Stand: standing
-  Sit: sitting
-  Squat: squatting
-```
-
-![with category name](media/01-05.jpeg)
-
-When including numbers, symbols, or brackets (like {}, <>), encase the string in "".
-
-Example: tags/test.yml
+### 使用举例
 
 ```yml
-Number: "1"
-Wildcard: "{__pose__}"
-```
-
-![with quotation mark](media/01-06.jpeg)
-
-After that, you can mix and match these methods (you can also layer categories).
-
-### A common mistake
-
-Do not line up items with the same name.
-
-Example: tags/test.yml
-
-```yml
-Building:
-  House: house
-  House: home
-```
-
-### Cautions
-
-- This extension may behave unpredictably if you regularly use the "@" symbol in your prompts.
-- Folder division in `/tags` is not supported.
-- You may need to restart the webui when adding a yml file.
-- If you are using the random feature, it's safer to restart when making changes.
-- If the "Select Tag" button doesn't respond, there's likely an error in your yml file, or the syntax isn't supported.
-- When editing yaml files with Mac TextEdit, please set the line break code to CRLF.
-
-### Additional Notes
-
-Currently, only three files are prepared for people, hair and faces, but more may be added in the future.
-
-These will appear in `sdweb-easy-prompt-selector/tags_examples/`, so feel free to copy from there as needed.
-
-### If something is unclear
-
-If you have any problems, please feel free to post them in the "Issues" section (although please note that I can't guarantee I'll be able to respond to all inquiries).
-
-## The Prompt Input Extension Has Been Updated
-
-April 9, 2023, 16:14
-
-Check out these new features!
-
-- Tags can now be deleted by right-clicking on the buttons.
-- The random function can now be used with wildcards.
-- Original prompt input is recorded in images as PNG Info when using the random function.
-- Support for infinite random loops has been added!
-- You can now specify the number of iterations in the random function (similar to Dynamic Prompts).
-
-### Delete Tags by Right-Clicking on Buttons
-
-Exactly as described. You can now delete a tag by clicking the button and then right-clicking on it.
-
-[![left-right click](media/02-03.png)](media/%E3%82%AF%E3%83%AA%E3%83%83%E3%82%AF%E3%81%97%E3%81%9F%E3%82%8A%E5%8F%B3%E3%82%AF%E3%83%AA%E3%83%83%E3%82%AF%E3%81%97%E3%81%9F%E3%82%8A%E3%81%97%E3%81%A6%E3%81%BE%E3%81%99%EF%BC%81.mp4)
-
-(Viewing this video requires downloading the mp4 file due to GitHub limitations)
-
-Thank you, [MrKuenning](https://github.com/MrKuenning), for your request on GitHub!
-
-### Wildcards Now Supported in Random Function
-
-Previously, the random function (for example @something@ like stuff), Dynamic Prompts, wildcards, and other core style features could not be used in tandem. Now, they can coexist, although there may still be some limitations.
-
-Please note, the tagging of sdweb-eagle-pnginfo may not work as expected due to this change.
-
-For users of sdweb-eagle-pnginfo, I suggest either:
-
-1. Enabling the option to use the old implementation of the random function in the settings (to maintain compatibility with sdweb-eagle-pnginfo), or
-2. Migrating to the updated version of sdweb-eagle-pnginfo available here: [sdweb-eagle-pnginfo](https://github.com/blue-pen5805/sdweb-eagle-pnginfo).
-
-### Recording of Original Prompt Input
-
-Now when you use the random function, the original prompt you entered can be recorded as shown:
-
-![original prompt input](media/01-07.jpeg)
-
-To use this feature, enable "Save the original prompt in pnginfo" from the settings screen.
-
-Thanks to null0000 & Rinoma for suggesting this feature on our [Discord](https://blue-pen5805.fanbox.cc/posts/5664903)!
-
-Note that the recorded prompt will have line breaks removed to ensure compatibility with the "send to" function.
-
-### Support for Infinite Random Loops
-
-You can now do things like having a random function within a random function!
-
-Example: hair.yml
-
-```yml
+# 文件名: color.yml
 Color:
   Black: black
   White: white
+  Yellow: yellow
+  Blue: blue
 
-Hair color:
-  Random: '@hair:Color@ hair'
-```
+# 文件名: hair.yml
+Random hair color:
+  # 随机 1 个头发颜色
+  Random: '@color:Color@ hair'
+  # 随机 2 个头发颜色
+  Random_2: '@2$$hair:Random hair color:Random@'
 
-You can now create random functions within other random functions! If you write it this way, typing @hair:Hair color@ will give you black hair or white hair!
-
-Please note: Despite the term "infinite", there is actually a limit of 100 loops.
-
-### Specify the Number of Iterations in the Random Function
-
-You can specify how many times a tag will be added by the random function.
-
-Example: animal.yml
-
-```yml
-Cute:
+# 文件名: animal.yml
+Animal:
   Cat: cat
   Dog: dog
   Panda: panda
   Gorilla: gorilla
+
+Random Animal:
+  # 随机 0-2 个动物
+  Random: '@0-2$$animal:Animal@'
+  # 随机 1 个动物
+  Random_1: '@animal:Animal@'
+  # 随机 3 个动物
+  Random_3: '@3$$animal:Animal@'
+  # 随机 1 个动物, 随机动物头发颜色
+  Random_Hair: '@animal:Animal@, @hair:Random hair color@'
 ```
-
-@3$$animal:Cute@ -> "panda, cat, dog"
-
-@0-2$$animal:Cute@ -> sometimes "cat", sometimes "dog, panda", or nothing
-
-Please be aware that this might result in duplicate tags, as it does not avoid duplications.
-
-### In Closing
-
-I apologize for any bugs that may occur! I appreciate your understanding.
