@@ -36,7 +36,7 @@ class EPSElementBuilder {
 
   // Elements
   static openButton({ onClick }) {
-    const button = EPSElementBuilder.baseButton('🔯タグを選択', { size: 'sm', color: 'secondary' })
+    const button = EPSElementBuilder.baseButton('🔯选择提示词/Select Prompt', { size: 'sm', color: 'secondary' })
     button.classList.add('easy_prompt_selector_button')
     button.addEventListener('click', onClick)
 
@@ -79,7 +79,7 @@ class EPSElementBuilder {
     select.style.margin = '2px'
     select.addEventListener('change', (event) => { onChange(event.target.value) })
 
-    const none = ['なし']
+    const none = ['空/Empty']
     none.concat(options).forEach((key) => {
       const option = document.createElement('option')
       option.value = key
@@ -98,7 +98,7 @@ class EPSElementBuilder {
     const checkbox = gradioApp().querySelector('input[type=checkbox]').cloneNode()
     checkbox.checked = false
     checkbox.addEventListener('change', (event) => {
-       onChange(event.target.checked)
+      onChange(event.target.checked)
     })
 
     const span = document.createElement('span')
@@ -179,7 +179,7 @@ class EasyPromptSelector {
     row.appendChild(dropDown)
 
     const settings = document.createElement('div')
-    const checkbox = EPSElementBuilder.checkbox('ネガティブプロンプトに入力', {
+    const checkbox = EPSElementBuilder.checkbox('负面提示词/Negative Prompt', {
       onChange: (checked) => { this.toNegative = checked }
     })
     settings.style.flex = '1'
